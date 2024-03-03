@@ -1,0 +1,28 @@
+--cpu Cortex-M3
+"fpm383c\startup_stm32f103xb.o"
+"fpm383c\fpm383c.o"
+"fpm383c\main.o"
+"fpm383c\gpio.o"
+"fpm383c\tim.o"
+"fpm383c\usart.o"
+"fpm383c\stm32f1xx_it.o"
+"fpm383c\stm32f1xx_hal_msp.o"
+"fpm383c\stm32f1xx_hal_gpio_ex.o"
+"fpm383c\stm32f1xx_hal_tim.o"
+"fpm383c\stm32f1xx_hal_tim_ex.o"
+"fpm383c\stm32f1xx_hal.o"
+"fpm383c\stm32f1xx_hal_rcc.o"
+"fpm383c\stm32f1xx_hal_rcc_ex.o"
+"fpm383c\stm32f1xx_hal_gpio.o"
+"fpm383c\stm32f1xx_hal_dma.o"
+"fpm383c\stm32f1xx_hal_cortex.o"
+"fpm383c\stm32f1xx_hal_pwr.o"
+"fpm383c\stm32f1xx_hal_flash.o"
+"fpm383c\stm32f1xx_hal_flash_ex.o"
+"fpm383c\stm32f1xx_hal_exti.o"
+"fpm383c\stm32f1xx_hal_uart.o"
+"fpm383c\system_stm32f1xx.o"
+--strict --scatter "fpm383c\fpm383c.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "fpm383c.map" -o fpm383c\fpm383c.axf
