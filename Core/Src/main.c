@@ -24,7 +24,7 @@
 #include "vue.h"
 
 void SystemClock_Config(void);
-int q=250;
+int q=50;
 int main(void)
 {
 
@@ -101,9 +101,9 @@ if(HAL_GPIO_ReadPin(GPIOA,Delete_button_Pin)==GPIO_PIN_RESET){
 			
 			if(Get_Ps_SearchMBBuffer(PS_SearchMBBuffer)){
 			//验证成功
-      __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,250); //相当于一个周期内（20ms）有2.5ms高脉冲
+      __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q); //相当于一个周期内（20ms）有2.5ms高脉冲
 				 HAL_Delay(1000);
-				  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q);
+				  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,50);
 			}
 			 Get_PS_Sleep(PS_SleepBuffer);
 		} 
@@ -118,10 +118,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
   if(GPIO_Pin==GPIO_PIN_11){
 	while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_11)==RESET){
 	__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q);
-		q-=5;
+		q+=5;
 		HAL_Delay(500);
-		if(q<=50){
-		q=250;
+		if(q>=250){
+		q=50;
 		}
 	}
 	
