@@ -24,16 +24,25 @@
 #include "vue.h"
 
 void SystemClock_Config(void);
-int q=50;
+//uint8_t q=0x32;
+FLASH_EraseInitTypeDef flash_massage;	
+uint32_t pageerror=0;
 int main(void)
 {
 
   HAL_Init();
   SystemClock_Config();
-
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM2_Init();
+	
+	//写入flash结构体
+	flash_massage.TypeErase=FLASH_TYPEERASE_PAGES;
+	flash_massage.PageAddress=0x0801FFF0;
+	flash_massage.NbPages=1;
+
+	
+	
 	HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_4);//***定时器初始化
 	 __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,50); //相当于一个周期内（20ms）有0.5ms高脉冲
 	HAL_Delay(500);
@@ -74,15 +83,17 @@ if(HAL_GPIO_ReadPin(GPIOA,Register_button_Pin)==GPIO_PIN_RESET){
 if(HAL_GPIO_ReadPin(GPIOA,Delete_button_Pin)==GPIO_PIN_RESET){
 				//判断删除指纹按钮是否按下
 			bool state=false;
-			HAL_GPIO_WritePin(GPIOA, Delete_led_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOA, Delete_led_Pin, GPIO_PIN_RESET);//设置删除led的状态
 			while(1){
 				Set_LED_mood("RED",1,3);
 				//删除函数
 			if(Get_image(PS_GetImageBuffer)&&Get_PS_Genchar(PS_GenChar,1)){
+					//如果获得图形成功，跳出循环
+				//给出状态位
 				state=true;
 			break;
 			}
-			}
+			}//获得指纹数据后才可删除
 			if(state){
 				uint8_t ID=0x00;
 				ID=Get_Delete_ID(PS_SearchMBBuffer);
@@ -97,13 +108,14 @@ if(HAL_GPIO_ReadPin(GPIOA,Delete_button_Pin)==GPIO_PIN_RESET){
  if(HAL_GPIO_ReadPin(Touch_out_GPIO_Port,Touch_out_Pin)==GPIO_PIN_SET){
  //指纹验证函数
  if(Get_image(PS_GetImageBuffer)&&HAL_GPIO_ReadPin(Touch_out_GPIO_Port,Touch_out_Pin)==GPIO_PIN_SET){
-	 
+	 //指纹模块断电后会自动解锁
+	 //加入触摸电平检测后，解决问题
 			if(Get_PS_Genchar(PS_GenChar,1)&&HAL_GPIO_ReadPin(Touch_out_GPIO_Port,Touch_out_Pin)==GPIO_PIN_SET){
 				if(Get_Ps_SearchMBBuffer(PS_SearchMBBuffer)){
-			//验证成功
-      __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q); //相当于一个周期内（20ms）有2.5ms高脉冲
+			//验证成功	 
+      __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,*(uint8_t*)(0x0801FFF0));//待转角度，读取储存在flash内的角度。
 				 HAL_Delay(1000);
-				  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,50);
+				  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,0x32);//回位角度
 			}
 			}
 		}  Get_PS_Sleep(PS_SleepBuffer);
@@ -111,20 +123,24 @@ if(HAL_GPIO_ReadPin(GPIOA,Delete_button_Pin)==GPIO_PIN_RESET){
 		
 		
   }
-  /* USER CODE END 3 */
+ //舵机角度调整中断回调函数
 }
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if(GPIO_Pin==GPIO_PIN_11){
 	while(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_11)==RESET){
-	__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q);
-		q+=5;
-		HAL_Delay(500);
-		if(q>=250){
-		q=50;
+		HAL_FLASH_Unlock();  //解锁flash
+		uint8_t q=*(uint8_t*)(0x0801FFF0);//获取flash内地址的值
+		HAL_FLASHEx_Erase(&flash_massage,  &pageerror);//擦除地址内的数据
+		q+=0x05;//角度加
+		if(q>=0xFA){//如果角度超过一定数值
+		q=0x32;//数据复原
 		}
+		__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q);	//舵机旋转
+		HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, 0x0801FFF0, q);//向flash内写入数据
+		HAL_Delay(500);	
+		HAL_FLASH_Lock();  //flash上锁
 	}
-	
 	}
 }
 /**
