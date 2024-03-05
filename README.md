@@ -9,3 +9,5 @@
 7. 模块触摸引脚 Touch_out->PB12   输入模式  输入下拉
 8. PWM 舵机 ->PA3 预分频 720 计数模式 up  重装载器 2000  自动重装载开启 TIM2_CH4
 9.     STM32f103c8t6 频率为72Mhz
+![image](https://github.com/Mieir/STMf103c8t6_FPM383c/blob/Motifiy/imags/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202024-03-05%20175412.png)
+![image]()
