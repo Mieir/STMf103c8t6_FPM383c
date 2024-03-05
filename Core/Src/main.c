@@ -96,17 +96,17 @@ if(HAL_GPIO_ReadPin(GPIOA,Delete_button_Pin)==GPIO_PIN_RESET){
 		}
  if(HAL_GPIO_ReadPin(Touch_out_GPIO_Port,Touch_out_Pin)==GPIO_PIN_SET){
  //指纹验证函数
- if(Get_image(PS_GetImageBuffer)&&Get_PS_Genchar(PS_GenChar,1)){
+ if(Get_image(PS_GetImageBuffer)&&HAL_GPIO_ReadPin(Touch_out_GPIO_Port,Touch_out_Pin)==GPIO_PIN_SET){
 	 
-			
-			if(Get_Ps_SearchMBBuffer(PS_SearchMBBuffer)){
+			if(Get_PS_Genchar(PS_GenChar,1)&&HAL_GPIO_ReadPin(Touch_out_GPIO_Port,Touch_out_Pin)==GPIO_PIN_SET){
+				if(Get_Ps_SearchMBBuffer(PS_SearchMBBuffer)){
 			//验证成功
       __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,q); //相当于一个周期内（20ms）有2.5ms高脉冲
 				 HAL_Delay(1000);
 				  __HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_4,50);
 			}
-			 Get_PS_Sleep(PS_SleepBuffer);
-		} 
+			}
+		}  Get_PS_Sleep(PS_SleepBuffer);
  } 
 		
 		
