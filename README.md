@@ -9,6 +9,7 @@
 7. 模块触摸引脚 Touch_out->PB12   输入模式  输入下拉
 8. PWM 舵机 ->PA3 预分频 720 计数模式 up  重装载器 2000  自动重装载开启 TIM2_CH4
 9.     STM32f103c8t6 频率为72Mhz
+   通过文档说明书 实现自动注册和删除(会自动获取指纹id实现指纹注册和删除)同时通过写入内部flash实现对舵机角度的记录实现掉电不丢失旋转角度。
 ![image](https://github.com/Mieir/STMf103c8t6_FPM383c/blob/Motifiy/imags/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE%202024-03-05%20175412.png)
 ![image](https://github.com/Mieir/STMf103c8t6_FPM383c/blob/Motifiy/imags/2c6ac95ff3e78762511a8fcb162c249.jpg)
 ![image](https://github.com/Mieir/STMf103c8t6_FPM383c/blob/Motifiy/imags/a64c2afbc1f4a178320130d30867fd0.jpg)
