@@ -18,9 +18,11 @@ return sum;//获得校验和
 /* 将指纹信息放到缓冲区*/
 bool Get_image(uint8_t *GetImageBuffer){	
 
-	HAL_UART_Transmit(&huart1,GetImageBuffer,12,100);
+	//HAL_UART_Transmit(&huart1,GetImageBuffer,12,100);
+	TX_data(GetImageBuffer,12);
 	//数据发送和数据接收之间不能加延时函数
-	HAL_UART_Receive(&huart1,PS_ReceiveBuffer,12,HAL_MAX_DELAY);
+	//HAL_UART_Receive(&huart1,PS_ReceiveBuffer,12,HAL_MAX_DELAY);
+	RX_data(PS_ReceiveBuffer,12);
 	//获得缓冲数据后首先验证数据完整性
 	if(Check_sum(PS_ReceiveBuffer)==PS_ReceiveBuffer[11]){
 	if(PS_ReceiveBuffer[9]==0x00){
@@ -58,8 +60,10 @@ bool Get_PS_Genchar(uint8_t *GetGenchar,int buffer_id){
 	for(int i=0;i<=19;i++){
 	PS_ReceiveBuffer[i]=0x00;
 	}
-	HAL_UART_Transmit(&huart1,GetGenchar,13,200);
-	HAL_UART_Receive(&huart1,PS_ReceiveBuffer,12,HAL_MAX_DELAY);
+	//HAL_UART_Transmit(&huart1,GetGenchar,13,200);
+	//HAL_UART_Receive(&huart1,PS_ReceiveBuffer,12,HAL_MAX_DELAY);
+	TX_data(GetGenchar,13);
+	RX_data(PS_ReceiveBuffer,12);
 	//判断接收包数据完整性和流程功能
 if(Check_sum(PS_ReceiveBuffer)==PS_ReceiveBuffer[11]){
 	if(PS_ReceiveBuffer[9]==0x00){
@@ -110,8 +114,10 @@ if(Check_sum(PS_ReceiveBuffer)==PS_ReceiveBuffer[11]){
 }
 /**(搜索指纹模块)查询指纹是否注册**/
 bool Get_Ps_SearchMBBuffer(uint8_t *PS_SearchMBBuffer){
-	HAL_UART_Transmit(&huart1,PS_SearchMBBuffer,17,100);
-	HAL_UART_Receive(&huart1,PS_ReceiveBuffer,16,HAL_MAX_DELAY);
+	TX_data(PS_SearchMBBuffer,17);
+	RX_data(PS_ReceiveBuffer,16);
+//	HAL_UART_Transmit(&huart1,PS_SearchMBBuffer,17,100);
+	//HAL_UART_Receive(&huart1,PS_ReceiveBuffer,16,HAL_MAX_DELAY);
 	uint8_t sum=0x00;
 	for(int i=6;i<=13;i++){
 		sum+=PS_ReceiveBuffer[i];
@@ -343,6 +349,16 @@ bool Get_PS_DeleteBuffer(uint8_t *PS_DeleteBuffer,uint8_t ID){
 	}	
 
 }
-
-
+//发送数据封装
+void TX_data(uint8_t *TX_Data,int length){
+if(	HAL_UART_Transmit(&huart1,TX_Data,length,100)!=HAL_OK){
+	Set_LED_mood("BLUE",2,3);
+}
+}
+//接收数据封装
+void RX_data(uint8_t *RX_Data,int length){
+if(		HAL_UART_Receive(&huart1,RX_Data,length,500)!=HAL_OK){
+	Set_LED_mood("GREEN",2,3);
+}
+}
  
